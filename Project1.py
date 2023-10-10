@@ -206,6 +206,13 @@ class ParkingFloor:
                 freeSpots.append(spot)
         return freeSpots
 
+    def showOccupiedSpot(self, type):
+        occupiedSpots = []
+        for spot in self.__spots:
+            if spot.free == False and spot.type == type:
+                occupiedSpots.append(spot)
+        return occupiedSpots
+
     def updateStatus(self, spotNumber, status):
         for spot in self.__spots:
             if spot.spotNumber == spotNumber:
@@ -229,11 +236,18 @@ class ParkingStatus:
                 f"Number of free spots for {type} on Floor {floor.floor}: {len(freeSpots)}"
             )
 
-    def displaySpots(self, type):
+    def displayFreeSpots(self, type):
         for floor in self.__floors:
             freeSpots = floor.showFreeSpot(type)
             print(f"Free spots for {type} on Floor {floor.floor}: ")
             for spot in freeSpots:
+                print(spot.spotNumber, end=",")
+
+    def displayOccupiedSpots(self, type):
+        for floor in self.__floors:
+            occupiedSpots = floor.showOccupiedSpot(type)
+            print(f"Occupied spots for {type} on Floor {floor.floor}: ")
+            for spot in occupiedSpots:
                 print(spot.spotNumber, end=",")
 
 
