@@ -31,13 +31,15 @@ class Person:
         self.phone = phone
         
 class ParkingTicket:
-    def __init__(self, ticketID, ticketStatus, payedAmount, carNumber):
+    def __init__(self, ticketID, ticketStatus, payedAmount, carNumber, floor, vehicleType):
         self.ticketId = ticketID
         self.arriveTime = datetime.datetime.now()
         self.ticketStatus = ticketStatus
         self.payedAmount = payedAmount
         self.leaveTime = None
         self.carNumber = carNumber
+        self.floor = floor
+        self.vehicleType = vehicleType
     
 #Account, Admin, Customer
 class Account(ABC):
@@ -49,17 +51,20 @@ class Account(ABC):
         
         
 class Admin(Account):
+    def __init__(self, userId, userPassword, person, status = AccountStatus.ACTIVE):
+        super().__init__(userId, userPassword, person, status)
+        
     def modifyFee(self):
-        pass
+        None
     
     def modifyCarType(self):
-        pass
+        None
     
     def modifyParkingSpot(self):
-        pass
+        None
     
     def modifyTerminal(self):
-        pass
+        None
     
 class Customer(Account):
     def __init__(self, userId, userPassword, status, carNumber, ticketStatus):
@@ -67,19 +72,25 @@ class Customer(Account):
         self.carNumber = carNumber
         self.ticketStatus = ticketStatus
         
-    def processTicket(self) -> ParkingTicket:
-        stat = input("choose ticket status")
-        # need nested if statements
+    def processTicket(self) -> ParkingTicketStatus:
+        stat = input("choose ticket status\n\nPAID | ACTIVE | DAILY_PASS | SALE")
+        #PAID, ACTIVE, DAILY_PASS, SALE = 1,2,3,4
+        if stat == "PAID":
+            return ParkingTicketStatus.PAID
+        elif stat == "ACTIVE":
+            return ParkingTicketStatus.ACTIVE
+        elif stat == "DAILY_PASS":
+            return ParkingTicketStatus.DAILY_PASS
+        elif stat == "SALE":
+            return ParkingTicketStatus.SALE
+        else:
+            raise Exception("wrong ticket status.")
         
 #Terminal
-class Terminal(ABC):
+class EntranceTerminal:
     def __init__(self, id, floor):
         self.id = id
         self.floor = floor
-
-class EntranceTerminal(Terminal):
-    def __init__(self, id, floor):
-        super().__init__(id, floor)
         
     def printTicket(self):
         pass
@@ -90,6 +101,34 @@ class EntranceTerminal(Terminal):
     def logIn(self):
         pass
         
+class ExitTerminal:
+    def __init__(self, id, floor):
+        self.id = id
+        self.floor = floor
+        
+    def paymentProcess(self, ticket:ParkingTicket):
+        ticket.leaveTime = datetime.datetime.now()
+        tmp_hour = ticket.leaveTime.hour - ticket.arriveTime.hour
+        tmp_min = ticket.leaveTime.minute - ticket.arriveTime.minute
+        
+        if ticket.ticketStatus == ParkingTicketStatus.PAID:
+            print(f'you already paid {ticket.payedAmount}')
+        elif ticket.ticketStatus == ParkingTicketStatus.SALE:
+            print(f'you should pay {tmp_hour *3000* 0.9}')
+        elif ticket.ticketStatus == ParkingTicketStatus.DAILY_PASS:
+            print('Thank you for Daily pass')
+        elif ticket.ticketStatus == ParkingTicketStatus.ACTIVE:
+            if tmp_min <= 15:
+                print("it's free")
+            else:
+                print(f'you should pay {tmp_hour * 3000}')
+        return 
+    
+    #ticketID, ticketStatus, payedAmount, carNumber, floor
+    def scanTicket(self, ticket : ParkingTicket)-> tuple:
+        return ticket.floor, ticket.ticketStatus, ticket.payedAmount
+        
+    
 #ParkingSpot
 class ParkingSpot(ABC):
     def __init__(self, spotNumber, type):
@@ -141,6 +180,30 @@ class ParkingFloor:
 class ParkingStatus:
     def __init__(self, floor):
         self.floor = floor
-        self.carFreeSpot = None
-
-#ParkingLot(only one object for whole parking lot)
+        self.carFreeSpots = 0
+        self.truckFreeSpots = 0
+        self.electronicFreeSpots = 0
+        self.motorcycleFreeSpots = 0
+        
+    def showStatus(self):
+        pass
+        
+if __name__ == '__main__':
+    while True:
+        input = list(input().split())
+        if input[0] == 'exit':
+            print('program exit')
+            break
+        
+        elif input[0] == 'display':
+            pass
+        
+        elif input[0] == 'park':
+            pass
+        
+        elif input[0] == 'unpark':
+            pass
+        
+        elif input[0] == 'create_parking_lot':
+            pass
+        
