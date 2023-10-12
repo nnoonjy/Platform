@@ -288,51 +288,102 @@ class ParkingStatus:
         self.__floors[floorNumber].spots[spotNumber].free = True
 
 
+def getVehicleType():
+    typeBool = True
+
+    while typeBool:
+        typeBool = False
+        vehicleType = input(
+            "What is your vehicle type ?\n1. car\n2. electronic car\n3. motorcycle\n4. truck\n\nYour option : "
+        )
+        if vehicleType == "1":
+            vehicleType = "car"  # 여기서부터 vehicle type을 어떻게 입력받을지
+        elif vehicleType == "2":
+            vehicleType = "electronic car"
+        elif vehicleType == "3":
+            vehicleType = "motorcycle"
+        elif vehicleType == "4":
+            vehicleType = "truck"
+        else:
+            typeBool = True
+            vehicleType = print("You selected the wrong number. Please choose again.")
+
+    return vehicleType
+
+
 if __name__ == "__main__":
     parkingLot = None
     idCounter = 0
     while True:
-        user_input = list(input().split())
-        if user_input[0] == "exit":
-            print("program exit")
-            break
+        option = input(
+            "Welcome to the BONG Parking Lot !\nType the number of the option you need.\n1. exit\n2. display\n3. park\n4. unpark\n5. create parking lot\n\nYour option : "
+        )
 
-        elif user_input[0] == "display":
-            if user_input[1] == "free_slots":
-                parkingLot.entranceTerminal.parkingStatus.displayFreeSpots(
-                    user_input[2]
-                )
-            elif user_input[1] == "occupied_slots":
-                parkingLot.entranceTerminal.parkingStatus.displayOccupiedSpots(
-                    user_input[2]
-                )
-            else:
-                parkingLot.entranceTerminal.parkingStatus.displayCount(user_input[2])
+        if "1" <= option <= "5":
+            if option == "1":
+                print("program exit")
+                break
+            elif option == "2":
+                optionBool = True
+                while optionBool:
+                    displayOption = input(
+                        "Which option do you want to see ?\n1. free slots\n2. occupied slots\n3. number of free slots\n0. Restart\n\nYour option : "
+                    )
+                    if displayOption == "0":
+                        print("")
+                        break
+                    elif "1" <= displayOption <= "3":
+                        optionBool = False
+                        vehicleType = getVehicleType()
 
-        elif user_input[0] == "park":
-            result = parkingLot.logIn(idCounter, user_input[2], user_input[1])
-            if result != None:
-                print(
-                    f"Parked vehicle! Ticket ID: {parkingLot.id}_{result[0]}_{result[1]}"
-                )
+                        if displayOption == "1":
+                            parkingLot.entranceTerminal.parkingStatus.displayFreeSpots(
+                                vehicleType
+                            )
+                        elif displayOption == "2":
+                            parkingLot.entranceTerminal.parkingStatus.displayOccupiedSpots(
+                                vehicleType
+                            )
+                        elif displayOption == "3":
+                            parkingLot.entranceTerminal.parkingStatus.displayCount(
+                                vehicleType
+                            )
+                    else:
+                        print("You selected the wrong number. Please choose again.")
+            elif option == "3":
+                inputId = input("Enter your vehicle ID : ")
+                vehicleType = getVehicleType()
+                result = parkingLot.logIn(idCounter, inputId, vehicleType)
+                if result != None:
+                    print(
+                        f"Parked vehicle! Ticket ID: {parkingLot.id}_{result[0]}_{result[1]}"
+                    )
+                else:
+                    print("Parking lot full!")
+                idCounter += 1
+            elif option == "4":
+                inputId = input("Enter your vehicle ID : ")
+                result = parkingLot.logOut(inputId)
+                if result == True:
+                    parkingLot.exitTerminal.paymentProcess(parkingLot.tickets[inputId])
+                    parkingLot.entranceTerminal.parkingStatus.unpark(
+                        parkingLot.tickets[inputId].floor,
+                        parkingLot.tickets[inputId].spot,
+                    )
+                else:
+                    print("Ticket not found!")
             else:
-                print("Parking lot full!")
-            idCounter += 1
-        elif user_input[0] == "unpark":
-            result = parkingLot.logOut(user_input[1])
-            if result == True:
-                parkingLot.exitTerminal.paymentProcess(
-                    parkingLot.tickets[user_input[1]]
+                parkinglotId = input("Enter the parking lot ID : ")
+                parkinglotFloor = input(
+                    "How many floors do you want for the parking lot ? (1~10): "
                 )
-                parkingLot.entranceTerminal.parkingStatus.unpark(
-                    parkingLot.tickets[user_input[1]].floor,
-                    parkingLot.tickets[user_input[1]].spot,
+                parkinglotSpot = input(
+                    "How many spots do you want for the parking lot ? (1~70):"
                 )
-            else:
-                print("Ticket not found!")
-        elif user_input[0] == "create_parking_lot":
-            parkingLot = ParkingLot(
-                user_input[1], int(user_input[2]), int(user_input[3])
-            )
+                parkingLot = ParkingLot(
+                    parkinglotId, int(parkinglotFloor), int(parkinglotSpot)
+                )
         else:
-            print("Command unknown!")
+            option = input(
+                "You typed the wrong option.\nPlease type again.\n1. exit\n2. display\n3. park\n4. unpark\n5. create parking lot\n\nYour option : "
+            )
