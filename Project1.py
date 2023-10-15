@@ -200,7 +200,7 @@ class ParkingFloor:
     def __init__(self, floor, spots):
         self.floor = floor
         self.spots = []
-        self.__numberOfSpots = 0
+        self.__numberOfSpots = 1
         for _ in range(spots):
             self.spots.append(CarSpot(self.__numberOfSpots))
             self.__numberOfSpots += 1
@@ -243,7 +243,7 @@ class ParkingStatus:
     def __init__(self, floor, spots):
         self.__floors = []
         self.__numberOfFloors = floor
-        for i in range(floor):
+        for i in range(1,floor+1):
             self.__floors.append(ParkingFloor(i, spots))
 
     def displayCount(self, type):
@@ -281,7 +281,7 @@ class ParkingStatus:
                     and self.__floors[index_floor].spots[index_spot].type.name == type
                 ):
                     self.__floors[index_floor].spots[index_spot].free = False
-                    return (index_floor, index_spot)
+                    return (index_floor+1, index_spot+1)
         return None
 
     def unpark(self, floorNumber, spotNumber):
@@ -297,13 +297,13 @@ def getVehicleType():
             "What is your vehicle type ?\n1. car\n2. electronic car\n3. motorcycle\n4. truck\n\nYour option : "
         )
         if vehicleType == "1":
-            vehicleType = "car"  # 여기서부터 vehicle type을 어떻게 입력받을지
+            vehicleType = "CAR"  # 여기서부터 vehicle type을 어떻게 입력받을지
         elif vehicleType == "2":
-            vehicleType = "electronic car"
+            vehicleType = "ELECTRONIC"
         elif vehicleType == "3":
-            vehicleType = "motorcycle"
+            vehicleType = "MOTORCYCLE"
         elif vehicleType == "4":
-            vehicleType = "truck"
+            vehicleType = "TRUCK"
         else:
             typeBool = True
             vehicleType = print("You selected the wrong number. Please choose again.")
@@ -356,7 +356,7 @@ if __name__ == "__main__":
                 result = parkingLot.logIn(idCounter, inputId, vehicleType)
                 if result != None:
                     print(
-                        f"Parked vehicle! Ticket ID: {parkingLot.id}_{result[0]}_{result[1]}"
+                        f"Parked vehicle! Ticket ID: {inputId}_{result[0]}_{result[1]}"
                     )
                 else:
                     print("Parking lot full!")
